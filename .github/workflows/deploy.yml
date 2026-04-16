@@ -12,6 +12,8 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout repository
@@ -34,11 +36,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: backend
           file: backend/Dockerfile
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/uts-sampah-backend:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
