@@ -1,4 +1,4 @@
-name: Deploy Backend to EC2
+name: Deploy backend
 
 on:
   push:
@@ -12,6 +12,7 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -26,7 +27,7 @@ jobs:
         run: npm install
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v5
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -41,36 +42,3 @@ jobs:
           tags: ghcr.io/${{ github.repository_owner }}/uts-sampah-backend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-  deploy:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to EC2 via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            # Login ke GitHub Container Registry di EC2
-            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-
-            # Hentikan dan hapus container lama agar tidak bentrok port
-            docker stop backend-container || true
-            docker rm backend-container || true
-
-            # Hapus image lama (opsional, untuk hemat disk space)
-            docker rmi ghcr.io/${{ github.repository_owner }}/uts-sampah-backend:latest || true
-
-            # Ambil image terbaru yang baru saja di-build
-            docker pull ghcr.io/${{ github.repository_owner }}/uts-sampah-backend:latest
-
-            # Jalankan container baru
-            # -p 80:3000 artinya aplikasi bisa diakses di http://44.203.210.3/ tanpa port
-            # --env-file memastikan aplikasi membaca database RDS dan S3
-            docker run -d \
-              --name backend-container \
-              -p 80:3000 \
-              --env-file /home/ubuntu/cleancity-uts/backend/.env \
-              ghcr.io/${{ github.repository_owner }}/uts-sampah-backend:latest
