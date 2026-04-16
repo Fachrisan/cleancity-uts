@@ -1,4 +1,4 @@
-name: Deploy backend
+name: Deploy backend and frontend
 
 on:
   push:
@@ -7,6 +7,7 @@ on:
       - master
     paths:
       - "backend/**"
+      - "frontend/**"
       - ".github/workflows/deploy.yml"
 
 jobs:
@@ -48,3 +49,29 @@ jobs:
           file: backend/Dockerfile
           push: true
           tags: ghcr.io/${{ env.REPO_OWNER }}/uts-sampah-backend:latest
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "frontend/"
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
