@@ -7,17 +7,32 @@ const db = require("../db");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// konfigurasi S3
+// ✅ konfigurasi S3 (pakai ENV, aman)
 const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY,
   secretAccessKey: process.env.AWS_SECRET_KEY,
-  region: process.env.AWS_REGION,
+  region: process.env.AWS_REGION || "us-east-1",
 });
 
+// =====================
 // POST laporan
+// =====================
 router.post("/", upload.single("foto"), (req, res) => {
   const file = req.file;
   const { lokasi, deskripsi } = req.body;
+
+  // ✅ validasi input
+  if (!lokasi || !deskripsi) {
+    return res.status(400).send("Lokasi & deskripsi wajib diisi");
+  }
+
+  if (!file) {
+    return res.status(400).send("File foto tidak ditemukan");
+  }
+
+  if (!process.env.S3_BUCKET) {
+    return res.status(500).send("S3_BUCKET belum diset di .env");
+  }
 
   const params = {
     Bucket: process.env.S3_BUCKET,
@@ -26,21 +41,44 @@ router.post("/", upload.single("foto"), (req, res) => {
     ContentType: file.mimetype,
   };
 
+  // upload ke S3
   s3.upload(params, (err, data) => {
-    if (err) return res.status(500).send(err);
+    if (err) {
+      console.error("S3 ERROR:", err);
+      return res.status(500).send("Upload ke S3 gagal");
+    }
 
     const sql = "INSERT INTO laporan (lokasi, deskripsi, foto_url) VALUES (?, ?, ?)";
+
     db.query(sql, [lokasi, deskripsi, data.Location], (err, result) => {
-      if (err) throw err;
-      res.send({ message: "Laporan berhasil", url: data.Location });
+      if (err) {
+        console.error("DB ERROR:", err);
+        return res.status(500).send("Gagal simpan ke database");
+      }
+
+      res.json({
+        message: "Laporan berhasil",
+        data: {
+          id: result.insertId,
+          lokasi,
+          deskripsi,
+          foto_url: data.Location,
+        },
+      });
     });
   });
 });
 
+// =====================
 // GET semua laporan
+// =====================
 router.get("/", (req, res) => {
-  db.query("SELECT * FROM laporan", (err, results) => {
-    if (err) throw err;
+  db.query("SELECT * FROM laporan ORDER BY id DESC", (err, results) => {
+    if (err) {
+      console.error("DB ERROR:", err);
+      return res.status(500).send("Gagal ambil data");
+    }
+
     res.json(results);
   });
 });
