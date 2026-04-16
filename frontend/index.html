@@ -18,13 +18,33 @@
         e.preventDefault();
 
         const formData = new FormData(this);
+        try {
+          const response = await fetch("http://YOUR_EC2_IP:3000/laporan", {
+            method: "POST",
+            body: formData,
+          });
 
-        await fetch("http://YOUR_EC2_IP:3000/laporan", {
-          method: "POST",
-          body: formData,
-        });
+          const rawBody = await response.text();
+          let payload = {};
 
-        alert("Laporan terkirim!");
+          if (rawBody) {
+            try {
+              payload = JSON.parse(rawBody);
+            } catch {
+              throw new Error(rawBody);
+            }
+          }
+
+          if (!response.ok) {
+            throw new Error(payload.message || `Request gagal (${response.status})`);
+          }
+
+          alert(payload.message || "Laporan terkirim!");
+          this.reset();
+        } catch (error) {
+          console.error(error);
+          alert(error.message || "Terjadi kesalahan saat kirim laporan");
+        }
       });
     </script>
   </body>
