@@ -1,23 +1,851 @@
 <!doctype html>
-<html>
+<html lang="id">
   <head>
     <title>Lapor Sampah</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --green: #1a6b3c;
+        --green-mid: #2d8f55;
+        --green-light: #e8f5ee;
+        --green-pale: #f2faf5;
+        --ink: #111510;
+        --ink-2: #3a4040;
+        --ink-3: #6b7270;
+        --border: #d4ddd8;
+        --surface: #ffffff;
+        --page: #f7f9f7;
+        --danger: #c0392b;
+        --danger-bg: #fdf1f0;
+        --amber: #b07d1a;
+        --amber-bg: #fdf8ed;
+        --radius: 10px;
+      }
+
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--page);
+        color: var(--ink);
+        min-height: 100vh;
+        font-size: 15px;
+        line-height: 1.6;
+      }
+
+      /* ── Header ── */
+      header {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 0 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .header-inner {
+        max-width: 960px;
+        margin: 0 auto;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--ink);
+        text-decoration: none;
+      }
+      .logo-icon {
+        width: 32px;
+        height: 32px;
+        background: var(--green);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .logo-icon svg {
+        width: 18px;
+        height: 18px;
+      }
+      nav {
+        display: flex;
+        gap: 4px;
+      }
+      nav button {
+        background: none;
+        border: none;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 14px;
+        color: var(--ink-3);
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          color 0.15s;
+        font-weight: 400;
+      }
+      nav button:hover {
+        background: var(--green-light);
+        color: var(--green);
+      }
+      nav button.active {
+        background: var(--green-light);
+        color: var(--green);
+        font-weight: 500;
+      }
+
+      /* ── Layout ── */
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 2.5rem 2rem 4rem;
+      }
+
+      .page-section {
+        display: none;
+      }
+      .page-section.visible {
+        display: block;
+      }
+
+      /* ── Page title ── */
+      .page-header {
+        margin-bottom: 2rem;
+      }
+      .page-header h1 {
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 4px;
+      }
+      .page-header p {
+        color: var(--ink-3);
+        font-size: 14px;
+      }
+
+      /* ── Card ── */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+      .card-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .card-header h2 {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--ink);
+      }
+      .card-header p {
+        font-size: 13px;
+        color: var(--ink-3);
+        margin-top: 1px;
+      }
+      .card-body {
+        padding: 1.5rem;
+      }
+
+      /* ── Form ── */
+      .form-grid {
+        display: grid;
+        gap: 1.25rem;
+      }
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .field label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink-2);
+        letter-spacing: 0.01em;
+      }
+      .field input[type="text"],
+      .field textarea,
+      .field select {
+        padding: 9px 12px;
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        font-family: inherit;
+        font-size: 14px;
+        color: var(--ink);
+        background: var(--surface);
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+        outline: none;
+        resize: none;
+      }
+      .field input[type="text"]:focus,
+      .field textarea:focus,
+      .field select:focus {
+        border-color: var(--green-mid);
+        box-shadow: 0 0 0 3px rgba(45, 143, 85, 0.1);
+      }
+      .field textarea {
+        min-height: 90px;
+      }
+
+      /* file input */
+      .file-drop {
+        border: 1.5px dashed var(--border);
+        border-radius: 7px;
+        padding: 1.25rem;
+        text-align: center;
+        cursor: pointer;
+        transition:
+          border-color 0.15s,
+          background 0.15s;
+        position: relative;
+        background: var(--page);
+      }
+      .file-drop:hover {
+        border-color: var(--green-mid);
+        background: var(--green-pale);
+      }
+      .file-drop.has-file {
+        border-color: var(--green-mid);
+        background: var(--green-pale);
+      }
+      .file-drop input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+      }
+      .file-drop-icon {
+        width: 36px;
+        height: 36px;
+        margin: 0 auto 8px;
+        color: var(--ink-3);
+      }
+      .file-drop-icon svg {
+        width: 100%;
+        height: 100%;
+      }
+      .file-drop-label {
+        font-size: 13px;
+        color: var(--ink-3);
+      }
+      .file-drop-label strong {
+        color: var(--green);
+      }
+      .file-name {
+        font-size: 12px;
+        font-family: "DM Mono", monospace;
+        color: var(--green);
+        margin-top: 4px;
+        display: none;
+      }
+
+      /* ── Divider ── */
+      .form-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 0.25rem 0;
+      }
+
+      /* ── Submit bar ── */
+      .form-actions {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        background: var(--page);
+      }
+      .form-note {
+        font-size: 13px;
+        color: var(--ink-3);
+      }
+
+      .btn {
+        padding: 9px 20px;
+        border-radius: 7px;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        border: 1px solid transparent;
+        transition: all 0.15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+      }
+      .btn svg {
+        width: 15px;
+        height: 15px;
+        flex-shrink: 0;
+      }
+      .btn-primary {
+        background: var(--green);
+        color: #fff;
+        border-color: var(--green);
+      }
+      .btn-primary:hover {
+        background: var(--green-mid);
+        border-color: var(--green-mid);
+      }
+      .btn-primary:active {
+        transform: scale(0.98);
+      }
+      .btn-primary:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+      }
+      .btn-ghost {
+        background: none;
+        color: var(--ink-3);
+        border-color: var(--border);
+      }
+      .btn-ghost:hover {
+        background: var(--green-light);
+        color: var(--ink-2);
+      }
+
+      /* ── Toast / Alert ── */
+      #toast-container {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        z-index: 999;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        pointer-events: none;
+      }
+      .toast {
+        pointer-events: all;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px 16px;
+        border-radius: var(--radius);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.09);
+        font-size: 14px;
+        min-width: 260px;
+        max-width: 360px;
+        animation: slideIn 0.25s ease;
+      }
+      .toast.success {
+        border-left: 3px solid var(--green);
+      }
+      .toast.error {
+        border-left: 3px solid var(--danger);
+      }
+      .toast-icon {
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+      .toast-text {
+        flex: 1;
+        line-height: 1.4;
+        color: var(--ink);
+      }
+      .toast-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--ink-3);
+        font-size: 16px;
+        line-height: 1;
+        padding: 0;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      /* ── Spinner ── */
+      .spinner {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-top-color: #fff;
+        animation: spin 0.6s linear infinite;
+        display: none;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ── Table ── */
+      .table-toolbar {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      .search-box {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        padding: 7px 12px;
+        background: var(--surface);
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+      .search-box:focus-within {
+        border-color: var(--green-mid);
+        box-shadow: 0 0 0 3px rgba(45, 143, 85, 0.1);
+      }
+      .search-box svg {
+        width: 14px;
+        height: 14px;
+        color: var(--ink-3);
+        flex-shrink: 0;
+      }
+      .search-box input {
+        border: none;
+        outline: none;
+        font-family: inherit;
+        font-size: 14px;
+        color: var(--ink);
+        background: none;
+        width: 220px;
+      }
+      .table-count {
+        font-size: 13px;
+        color: var(--ink-3);
+        white-space: nowrap;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      thead {
+        background: var(--page);
+      }
+      th {
+        padding: 10px 16px;
+        text-align: left;
+        font-weight: 500;
+        font-size: 12px;
+        color: var(--ink-3);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+        cursor: pointer;
+        user-select: none;
+      }
+      th:hover {
+        color: var(--green);
+      }
+      th .sort-icon {
+        display: inline-block;
+        margin-left: 4px;
+        opacity: 0.4;
+        font-size: 10px;
+      }
+      th.sorted .sort-icon {
+        opacity: 1;
+        color: var(--green);
+      }
+      td {
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--border);
+        color: var(--ink-2);
+        vertical-align: top;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: var(--green-pale);
+      }
+      .td-id {
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+        color: var(--ink-3);
+      }
+      .td-lokasi {
+        font-weight: 500;
+        color: var(--ink);
+      }
+      .td-desc {
+        color: var(--ink-3);
+        font-size: 13px;
+        max-width: 280px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .td-foto a {
+        color: var(--green);
+        font-size: 13px;
+        text-decoration: none;
+      }
+      .td-foto a:hover {
+        text-decoration: underline;
+      }
+      .td-time {
+        font-size: 13px;
+        color: var(--ink-3);
+        white-space: nowrap;
+      }
+
+      .table-empty {
+        padding: 3rem 1.5rem;
+        text-align: center;
+        color: var(--ink-3);
+        font-size: 14px;
+      }
+      .table-empty svg {
+        width: 40px;
+        height: 40px;
+        margin: 0 auto 12px;
+        display: block;
+        opacity: 0.35;
+      }
+
+      /* ── Stats bar ── */
+      .stats-bar {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .stat-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1rem 1.25rem;
+      }
+      .stat-label {
+        font-size: 12px;
+        color: var(--ink-3);
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-weight: 500;
+      }
+      .stat-value {
+        font-size: 26px;
+        font-weight: 600;
+        color: var(--ink);
+        line-height: 1;
+      }
+      .stat-value.green {
+        color: var(--green);
+      }
+
+      /* ── Loading skeleton ── */
+      .skeleton-row td div {
+        height: 14px;
+        border-radius: 4px;
+        background: linear-gradient(90deg, #e8ede9 25%, #f2f6f2 50%, #e8ede9 75%);
+        background-size: 200%;
+        animation: shimmer 1.2s infinite;
+      }
+      @keyframes shimmer {
+        from {
+          background-position: 200% 0;
+        }
+        to {
+          background-position: -200% 0;
+        }
+      }
+
+      /* ── Responsive ── */
+      @media (max-width: 640px) {
+        main {
+          padding: 1.5rem 1rem 3rem;
+        }
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+        .stats-bar {
+          grid-template-columns: 1fr 1fr;
+        }
+        .search-box input {
+          width: 140px;
+        }
+        .form-actions {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    </style>
   </head>
   <body>
-    <h2>Lapor Website Sampah</h2>
+    <header>
+      <div class="header-inner">
+        <a class="logo" href="#">
+          <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6l-1 14H6L5 6" />
+              <path d="M10 11v6" />
+              <path d="M14 11v6" />
+              <path d="M9 6V4h6v2" />
+            </svg>
+          </div>
+          Lapor Sampah
+        </a>
+        <nav>
+          <button class="active" onclick="showSection('lapor', this)">Buat Laporan</button>
+          <button onclick="showSection('data', this)">Data Laporan</button>
+        </nav>
+      </div>
+    </header>
 
-    <form id="form">
-      Lokasi: <input type="text" name="lokasi" /><br /><br />
-      Deskripsi: <input type="text" name="deskripsi" /><br /><br />
-      Foto: <input type="file" name="foto" /><br /><br />
-      <button type="submit">Kirim</button>
-    </form>
+    <main>
+      <!-- ── Lapor Section ── -->
+      <div id="section-lapor" class="page-section visible">
+        <div class="page-header">
+          <h1>Buat Laporan Baru</h1>
+          <p>Laporkan lokasi sampah liar atau masalah kebersihan di sekitar Anda.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>Detail Laporan</h2>
+              <p>Isi semua kolom agar laporan dapat segera ditindaklanjuti.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <form id="form">
+              <div class="form-grid">
+                <div class="field">
+                  <label for="lokasi">Lokasi</label>
+                  <input type="text" id="lokasi" name="lokasi" placeholder="Contoh: Jl. Sudirman No. 12, Jakarta Selatan" />
+                </div>
+                <div class="field">
+                  <label for="deskripsi">Deskripsi</label>
+                  <textarea id="deskripsi" name="deskripsi" placeholder="Jelaskan kondisi sampah, volume, atau detail penting lainnya..."></textarea>
+                </div>
+                <div class="field">
+                  <label>Foto Bukti</label>
+                  <div class="file-drop" id="file-drop">
+                    <input type="file" name="foto" id="foto-input" accept="image/*" />
+                    <div class="file-drop-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <circle cx="8.5" cy="8.5" r="1.5" />
+                        <polyline points="21 15 16 10 5 21" />
+                      </svg>
+                    </div>
+                    <div class="file-drop-label"><strong>Klik untuk unggah</strong> atau seret foto ke sini</div>
+                    <div class="file-drop-label" style="font-size: 12px; margin-top: 3px">PNG, JPG, WEBP hingga 10 MB</div>
+                    <div class="file-name" id="file-name"></div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="form-actions">
+            <span class="form-note">Laporan bersifat anonim dan akan diteruskan ke dinas terkait.</span>
+            <div style="display: flex; gap: 8px; align-items: center">
+              <button
+                class="btn btn-ghost"
+                type="button"
+                onclick="
+                  document.getElementById('form').reset();
+                  resetFileInput();
+                "
+              >
+                Batal
+              </button>
+              <button class="btn btn-primary" id="submit-btn" type="button" onclick="submitForm()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+                <span id="btn-label">Kirim Laporan</span>
+                <div class="spinner" id="spinner"></div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Data Section ── -->
+      <div id="section-data" class="page-section">
+        <div class="page-header">
+          <h1>Data Laporan</h1>
+          <p>Riwayat semua laporan yang telah masuk ke sistem.</p>
+        </div>
+
+        <div class="stats-bar">
+          <div class="stat-card">
+            <div class="stat-label">Total Laporan</div>
+            <div class="stat-value green" id="stat-total">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Dengan Foto</div>
+            <div class="stat-value" id="stat-foto">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Laporan Hari Ini</div>
+            <div class="stat-value" id="stat-today">—</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-toolbar">
+            <div class="search-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input type="text" id="search-input" placeholder="Cari lokasi atau deskripsi..." oninput="filterTable()" />
+            </div>
+            <span class="table-count" id="table-count"></span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th onclick="sortTable('id')">ID <span class="sort-icon">↕</span></th>
+                  <th onclick="sortTable('lokasi')">Lokasi <span class="sort-icon">↕</span></th>
+                  <th onclick="sortTable('deskripsi')">Deskripsi <span class="sort-icon">↕</span></th>
+                  <th>Foto</th>
+                  <th onclick="sortTable('waktu')">Waktu <span class="sort-icon">↕</span></th>
+                </tr>
+              </thead>
+              <tbody id="table-body">
+                <tr class="skeleton-row">
+                  <td><div style="width: 40px"></div></td>
+                  <td><div style="width: 120px"></div></td>
+                  <td><div style="width: 200px"></div></td>
+                  <td><div style="width: 60px"></div></td>
+                  <td><div style="width: 80px"></div></td>
+                </tr>
+                <tr class="skeleton-row">
+                  <td><div style="width: 40px"></div></td>
+                  <td><div style="width: 100px"></div></td>
+                  <td><div style="width: 180px"></div></td>
+                  <td><div style="width: 60px"></div></td>
+                  <td><div style="width: 80px"></div></td>
+                </tr>
+                <tr class="skeleton-row">
+                  <td><div style="width: 40px"></div></td>
+                  <td><div style="width: 140px"></div></td>
+                  <td><div style="width: 160px"></div></td>
+                  <td><div style="width: 60px"></div></td>
+                  <td><div style="width: 80px"></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div id="toast-container"></div>
 
     <script>
-      document.getElementById("form").addEventListener("submit", async function (e) {
-        e.preventDefault();
+      // ── Navigation ──
+      function showSection(name, btn) {
+        document.querySelectorAll(".page-section").forEach((s) => s.classList.remove("visible"));
+        document.querySelectorAll("nav button").forEach((b) => b.classList.remove("active"));
+        document.getElementById("section-" + name).classList.add("visible");
+        btn.classList.add("active");
+        if (name === "data") loadTable();
+      }
 
-        const formData = new FormData(this);
+      // ── File input ──
+      document.getElementById("foto-input").addEventListener("change", function () {
+        const wrap = document.getElementById("file-drop");
+        const label = document.getElementById("file-name");
+        if (this.files && this.files[0]) {
+          wrap.classList.add("has-file");
+          label.style.display = "block";
+          label.textContent = this.files[0].name;
+        } else {
+          resetFileInput();
+        }
+      });
+      function resetFileInput() {
+        document.getElementById("file-drop").classList.remove("has-file");
+        document.getElementById("file-name").style.display = "none";
+        document.getElementById("file-name").textContent = "";
+      }
+
+      // ── Toast ──
+      function toast(msg, type = "success") {
+        const c = document.getElementById("toast-container");
+        const t = document.createElement("div");
+        t.className = "toast " + type;
+        const icon =
+          type === "success"
+            ? `<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="${"#1a6b3c"}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+            : `<svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+        t.innerHTML = icon + `<span class="toast-text">${msg}</span><button class="toast-close" onclick="this.parentElement.remove()">×</button>`;
+        c.appendChild(t);
+        setTimeout(() => t.remove(), 5000);
+      }
+
+      // ── Submit ──
+      async function submitForm() {
+        const btn = document.getElementById("submit-btn");
+        const lbl = document.getElementById("btn-label");
+        const sp = document.getElementById("spinner");
+
+        btn.disabled = true;
+        lbl.textContent = "Mengirim...";
+        sp.style.display = "block";
+
+        const formData = new FormData(document.getElementById("form"));
         try {
           const response = await fetch("http://YOUR_EC2_IP:3000/laporan", {
             method: "POST",
@@ -39,13 +867,119 @@
             throw new Error(payload.message || `Request gagal (${response.status})`);
           }
 
-          alert(payload.message || "Laporan terkirim!");
-          this.reset();
+          toast(payload.message || "Laporan berhasil terkirim!", "success");
+          document.getElementById("form").reset();
+          resetFileInput();
         } catch (error) {
           console.error(error);
-          alert(error.message || "Terjadi kesalahan saat kirim laporan");
+          toast(error.message || "Terjadi kesalahan saat kirim laporan", "error");
+        } finally {
+          btn.disabled = false;
+          lbl.textContent = "Kirim Laporan";
+          sp.style.display = "none";
         }
-      });
+      }
+
+      // ── Table ──
+      let allData = [];
+      let sortKey = null,
+        sortAsc = true;
+
+      async function loadTable() {
+        try {
+          const res = await fetch("http://YOUR_EC2_IP:3000/laporan");
+          const data = await res.json();
+          allData = Array.isArray(data) ? data : data.data || [];
+          updateStats();
+          renderTable(allData);
+        } catch (e) {
+          document.getElementById("table-body").innerHTML = `
+            <tr><td colspan="5">
+              <div class="table-empty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                Gagal memuat data. Periksa koneksi ke server.
+              </div>
+            </td></tr>`;
+          document.getElementById("table-count").textContent = "";
+        }
+      }
+
+      function updateStats() {
+        const today = new Date().toDateString();
+        document.getElementById("stat-total").textContent = allData.length;
+        document.getElementById("stat-foto").textContent = allData.filter((d) => d.foto || d.foto_url).length;
+        document.getElementById("stat-today").textContent = allData.filter((d) => {
+          if (!d.created_at && !d.waktu) return false;
+          return new Date(d.created_at || d.waktu).toDateString() === today;
+        }).length;
+      }
+
+      function renderTable(data) {
+        const tbody = document.getElementById("table-body");
+        document.getElementById("table-count").textContent = data.length + " laporan";
+        if (!data.length) {
+          tbody.innerHTML = `<tr><td colspan="5"><div class="table-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            Tidak ada data yang cocok.
+          </div></td></tr>`;
+          return;
+        }
+        tbody.innerHTML = data
+          .map((r) => {
+            const id = r.id || "—";
+            const lokasi = escHtml(r.lokasi || "—");
+            const desc = escHtml(r.deskripsi || "—");
+            const fotoUrl = r.foto_url || r.foto;
+            const fotoCell = fotoUrl ? `<a href="${escHtml(fotoUrl)}" target="_blank">Lihat foto</a>` : `<span style="color:var(--border)">—</span>`;
+            const waktu = r.created_at || r.waktu ? formatDate(r.created_at || r.waktu) : "—";
+            return `<tr>
+            <td class="td-id">#${id}</td>
+            <td class="td-lokasi">${lokasi}</td>
+            <td class="td-desc" title="${desc}">${desc}</td>
+            <td class="td-foto">${fotoCell}</td>
+            <td class="td-time">${waktu}</td>
+          </tr>`;
+          })
+          .join("");
+      }
+
+      function filterTable() {
+        const q = document.getElementById("search-input").value.toLowerCase();
+        const filtered = allData.filter((r) => (r.lokasi || "").toLowerCase().includes(q) || (r.deskripsi || "").toLowerCase().includes(q));
+        renderTable(filtered);
+      }
+
+      function sortTable(key) {
+        if (sortKey === key) sortAsc = !sortAsc;
+        else {
+          sortKey = key;
+          sortAsc = true;
+        }
+        document.querySelectorAll("th").forEach((th) => th.classList.remove("sorted"));
+        event.currentTarget.classList.add("sorted");
+        const sorted = [...allData].sort((a, b) => {
+          const va = (a[key] || "").toString().toLowerCase();
+          const vb = (b[key] || "").toString().toLowerCase();
+          return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+        });
+        renderTable(sorted);
+      }
+
+      function formatDate(str) {
+        try {
+          return new Intl.DateTimeFormat("id-ID", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(str));
+        } catch {
+          return str;
+        }
+      }
+
+      function escHtml(s) {
+        return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      }
     </script>
   </body>
 </html>
