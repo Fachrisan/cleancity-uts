@@ -19,6 +19,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Convert repository owner to lowercase
+        run: echo "REPO_OWNER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -29,7 +32,7 @@ jobs:
         run: npm install
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -41,4 +44,4 @@ jobs:
           context: backend
           file: backend/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/uts-sampah-backend:latest
+          tags: ghcr.io/${{ env.REPO_OWNER }}/uts-sampah-backend:latest
